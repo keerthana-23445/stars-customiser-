@@ -142,6 +142,7 @@
 <body>
 <main>
   <h1>⭐ STAR Customiser</h1>
+ <p id="testMessage">JavaScript test hasn't run yet.</p>
   <p class="subtitle">Create your own STAR!</p>
 
   <div class="layout">
@@ -312,5 +313,6 @@ async function downloadSTAR() {
     alert("I couldn't find my-star.png. Make sure it is beside index.html in your website folder.");
   });
 </script>
+ document.getElementById("testMessage").textContent = "JavaScript is working!";
 </body>
 </html>
