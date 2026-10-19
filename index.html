@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STAR Customiser</title>
+<style>
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 24px;
+    font-family: Arial, sans-serif;
+    background: #180b35;
+    color: white;
+  }
+
+  main {
+    max-width: 850px;
+    margin: auto;
+    text-align: center;
+  }
+
+  h1 { color: #ffd84d; }
+  .subtitle { color: #e0d8f2; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 28px;
+  }
+
+  .panel {
+    padding: 22px;
+    border-radius: 18px;
+    background: #29164a;
+  }
+
+  .preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 330px;
+  }
+
+  .star-container {
+    position: relative;
+    width: min(260px, 100%);
+    aspect-ratio: 1;
+  }
+
+  #starImage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: var(--star-filter, none);
+  }
+
+  #face, #accessory {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 44px;
+    line-height: 1.2;
+    pointer-events: none;
+  }
+
+  #face { top: 38%; }
+  #accessory { top: 2%; font-size: 38px; }
+
+  #starName {
+    margin-top: 12px;
+    color: #ffd84d;
+    font-size: 24px;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+  }
+
+  h2 { font-size: 18px; margin-top: 0; }
+
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 9px;
+    margin-bottom: 22px;
+  }
+
+  button, input {
+    font: inherit;
+    border-radius: 10px;
+    padding: 11px;
+  }
+
+  button {
+    cursor: pointer;
+    border: 2px solid transparent;
+    background: #49316c;
+    color: white;
+  }
+
+  button:hover, button:focus-visible {
+    border-color: #ffd84d;
+  }
+
+  .colour {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid white;
+  }
+
+  input {
+    width: 100%;
+    border: 0;
+    margin-bottom: 22px;
+  }
+
+  .main-button {
+    width: 100%;
+    background: #ffd84d;
+    color: #180b35;
+    font-weight: bold;
+    padding: 14px;
+  }
+
+  .hint {
+    font-size: 13px;
+    color: #d7cce9;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 620px) {
+    body { padding: 14px; }
+    .layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>⭐ STAR Customiser</h1>
+  <p class="subtitle">Create your own STAR!</p>
+
+  <div class="layout">
+    <section class="panel preview">
+      <div class="star-container">
+        <img id="starImage" src="./my-star.png"
+             alt="Your original STAR artwork">
+        <div id="accessory"></div>
+        <div id="face">😊</div>
+      </div>
+      <div id="starName">My STAR</div>
+    </section>
+
+    <section class="panel">
+      <h2>1. Choose a colour</h2>
+      <div class="choices">
+        <button class="colour" style="background:#ffd84d"
+          aria-label="Yellow" onclick="changeColour('yellow')"></button>
+        <button class="colour" style="background:#ff70b8"
+          aria-label="Pink" onclick="changeColour('pink')"></button>
+        <button class="colour" style="background:#62d9ff"
+          aria-label="Blue" onclick="changeColour('blue')"></button>
+        <button class="colour" style="background:#9dff91"
+          aria-label="Green" onclick="changeColour('green')"></button>
+        <button class="colour" style="background:#c69aff"
+          aria-label="Purple" onclick="changeColour('purple')"></button>
+        <button class="colour" style="background:#ff9873"
+          aria-label="Orange" onclick="changeColour('orange')"></button>
+      </div>
+
+      <h2>2. Choose a face</h2>
+      <div class="choices">
+        <button onclick="changeFace('😊')">😊</button>
+        <button onclick="changeFace('😎')">😎</button>
+        <button onclick="changeFace('😍')">😍</button>
+        <button onclick="changeFace('🤩')">🤩</button>
+        <button onclick="changeFace('😴')">😴</button>
+        <button onclick="changeFace('😜')">😜</button>
+      </div>
+
+      <h2>3. Add an accessory</h2>
+      <div class="choices">
+        <button onclick="changeAccessory('👑')">👑</button>
+        <button onclick="changeAccessory('🎀')">🎀</button>
+        <button onclick="changeAccessory('🕶️')">🕶️</button>
+        <button onclick="changeAccessory('✨')">✨</button>
+        <button onclick="changeAccessory('')">None</button>
+      </div>
+
+      <h2>4. Name your STAR</h2>
+      <input id="nameInput" maxlength="30"
+             placeholder="Enter your STAR's name"
+             oninput="updateName()">
+
+      <button class="main-button" onclick="downloadSTAR()">
+        Download My STAR
+      </button>
+      <p class="hint">Your original artwork stays in place as you customise it.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+  const image = document.getElementById("starImage");
+
+  const filters = {
+    yellow: "sepia(1) saturate(5) hue-rotate(10deg)",
+    pink: "sepia(1) saturate(5) hue-rotate(290deg)",
+    blue: "sepia(1) saturate(5) hue-rotate(160deg)",
+    green: "sepia(1) saturate(5) hue-rotate(80deg)",
+    purple: "sepia(1) saturate(5) hue-rotate(240deg)",
+    orange: "sepia(1) saturate(5) hue-rotate(340deg)"
+  };
+
+  let selectedColour = "yellow";
+  let selectedFace = "😊";
+  let selectedAccessory = "";
+
+  function changeColour(colour) {
+    selectedColour = colour;
+    image.style.filter = filters[colour];
+  }
+
+  function changeFace(face) {
+    selectedFace = face;
+    document.getElementById("face").textContent = face;
+  }
+
+  function changeAccessory(accessory) {
+    selectedAccessory = accessory;
+    document.getElementById("accessory").textContent = accessory;
+  }
+
+  function updateName() {
+    const name = document.getElementById("nameInput").value.trim();
+    document.getElementById("starName").textContent = name || "My STAR";
+  }
+
+  
+async function downloadSTAR() {
+  let imageURL;
+
+  try {
+    const response = await fetch("./my-star.png");
+
+    if (!response.ok) {
+      throw new Error("Could not load the STAR image.");
+    }
+
+    const imageBlob = await response.blob();
+    imageURL = URL.createObjectURL(imageBlob);
+
+    const star = new Image();
+    star.src = imageURL;
+    await star.decode();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 600;
+    canvas.height = 650;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#180b35";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.filter = filters[selectedColour];
+    ctx.drawImage(star, 100, 25, 400, 400);
+    ctx.filter = "none";
+
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.font = "70px Arial";
+    ctx.fillText(selectedAccessory, 300, 65);
+    ctx.fillText(selectedFace, 300, 225);
+
+    const name =
+      document.getElementById("nameInput").value.trim() || "My STAR";
+
+    ctx.fillStyle = "#ffd84d";
+    ctx.font = "bold 38px Arial";
+    ctx.fillText(name.slice(0, 25), 300, 520);
+
+    const pngBlob = await new Promise((resolve, reject) => {
+      canvas.toBlob(blob => {
+        if (blob) resolve(blob);
+        else reject(new Error("Could not create PNG."));
+      }, "image/png");
+    });
+
+    const downloadURL = URL.createObjectURL(pngBlob);
+    const link = document.createElement("a");
+    link.href = downloadURL;
+    link.download = "my-star-custom.png";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(downloadURL), 1000);
+  } catch (error) {
+    alert("The download failed. Please open your published website and try again.");
+    console.error(error);
+  } finally {
+    if (imageURL) URL.revokeObjectURL(imageURL);
+  }
+}
+
+      </style>
+    </head>
+
+    <body>
+      <div>
+        <div class="star">
+          <img src="${star.src}">
+          <div class="accessory">${selectedAccessory}</div>
+          <div class="face">${selectedFace}</div>
+        </div>
+        <div class="name">${name}</div>
+      </div>
+    </body>
+    </html>
+  `);
+
+  downloadWindow.document.close();
+}
+
+  image.addEventListener("error", () => {
+    alert("I couldn't find my-star.png. Make sure it is beside index.html in your website folder.");
+  });
+</script>
+</body>
+</html>
